@@ -1,9 +1,14 @@
 #!/bin/bash
 
-set -euo pipefail
+n=0
+while [ "$n" -lt 10 ] && [ -z "`netstat -tln | grep 5432`" ]; do
+    n=$(( n + 1 ))
+    sleep 1
+done
 
-# Wait until PostgreSQL started
-pg_isready -t 10
+if [ "$n" -eq 10 ]; then
+    exit 1
+fi
 
 # Start server.
 echo 'Starting Freeswitch...'
