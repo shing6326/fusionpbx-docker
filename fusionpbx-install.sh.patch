@@ -1,8 +1,18 @@
 diff --git a/debian/resources/finish.sh b/debian/resources/finish.sh
-index 34139dc..952b19f 100755
+index 34139dc..803442a 100755
 --- a/debian/resources/finish.sh
 +++ b/debian/resources/finish.sh
-@@ -98,8 +98,7 @@ sed -i /etc/freeswitch/autoload_configs/xml_cdr.conf.xml -e s:"{v_pass}:$xml_cdr
+@@ -25,9 +25,7 @@ sudo -u postgres psql -c "ALTER USER freeswitch WITH PASSWORD '$database_passwor
+ #install the database backup
+ cp backup/fusionpbx-backup /etc/cron.daily
+ cp backup/fusionpbx-maintenance /etc/cron.daily
+-chmod 755 /etc/cron.daily/fusionpbx-backup
+ chmod 755 /etc/cron.daily/fusionpbx-maintenance
+-sed -i "s/zzz/$database_password/g" /etc/cron.daily/fusionpbx-backup
+ sed -i "s/zzz/$database_password/g" /etc/cron.daily/fusionpbx-maintenance
+ 
+ #add the config.php
+@@ -98,8 +96,7 @@ sed -i /etc/freeswitch/autoload_configs/xml_cdr.conf.xml -e s:"{v_pass}:$xml_cdr
  cd /var/www/fusionpbx && php /var/www/fusionpbx/core/upgrade/upgrade_domains.php
  
  #restart freeswitch

@@ -1,11 +1,9 @@
 #!/bin/bash
-# Wait until PostgreSQL started and listens on port 5432.
-while [ -z "`netstat -tln | grep 5432`" ]; do
-  echo 'Waiting for PostgreSQL to start ...'
-  sleep 1
-done
-echo 'PostgreSQL started.'
-sleep 10
+
+set -euo pipefail
+
+# Wait until PostgreSQL started
+pg_isready -t 10
 
 # Start server.
 echo 'Starting Freeswitch...'
