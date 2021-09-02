@@ -1,0 +1,167 @@
+diff --git a/debian/resources/finish.sh b/debian/resources/finish.sh
+index 34139dc..952b19f 100755
+--- a/debian/resources/finish.sh
++++ b/debian/resources/finish.sh
+@@ -98,8 +98,7 @@ sed -i /etc/freeswitch/autoload_configs/xml_cdr.conf.xml -e s:"{v_pass}:$xml_cdr
+ cd /var/www/fusionpbx && php /var/www/fusionpbx/core/upgrade/upgrade_domains.php
+ 
+ #restart freeswitch
+-/bin/systemctl daemon-reload
+-/bin/systemctl restart freeswitch
++supervisorctl restart freeswitch
+ 
+ #welcome message
+ echo ""
+diff --git a/debian/resources/nginx.sh b/debian/resources/nginx.sh
+index c30ddc5..f71b644 100755
+--- a/debian/resources/nginx.sh
++++ b/debian/resources/nginx.sh
+@@ -71,8 +71,5 @@ if [ .$letsencrypt_folder = .true ]; then
+         mkdir -p /var/www/letsencrypt/
+ fi
+ 
+-#flush systemd cache
+-systemctl daemon-reload
+-
+ #restart nginx
+-service nginx restart
++supervisorctl restart nginx
+diff --git a/debian/resources/php.sh b/debian/resources/php.sh
+index 547f7bc..cb3fb2d 100755
+--- a/debian/resources/php.sh
++++ b/debian/resources/php.sh
+@@ -99,22 +99,24 @@ if [ .$cpu_architecture = .'x86' ]; then
+ 	. ./ioncube.sh
+ fi
+ 
++mkdir -p /run/php
++chown -R www-data:www-data /run/php
++
+ #restart php-fpm
+-systemctl daemon-reload
+ if [ ."$php_version" = ."5.6" ]; then
+-        systemctl restart php5-fpm
++        supervisorctl restart php5-fpm
+ fi
+ if [ ."$php_version" = ."7.0" ]; then
+-        systemctl restart php7.0-fpm
++        supervisorctl restart php7.0-fpm
+ fi
+ if [ ."$php_version" = ."7.1" ]; then
+-        systemctl restart php7.1-fpm
++        supervisorctl restart php7.1-fpm
+ fi
+ if [ ."$php_version" = ."7.2" ]; then
+-        systemctl restart php7.2-fpm
++        supervisorctl restart php7.2-fpm
+ fi
+ if [ ."$php_version" = ."7.3" ]; then
+-        systemctl restart php7.3-fpm
++        supervisorctl restart php7.3-fpm
+ fi
+ 
+ #init.d
+diff --git a/debian/resources/postgresql.sh b/debian/resources/postgresql.sh
+index 1a2e457..e7688f6 100755
+--- a/debian/resources/postgresql.sh
++++ b/debian/resources/postgresql.sh
+@@ -72,8 +72,7 @@ fi
+ 
+ #systemd
+ if [ ."$database_host" = ."127.0.0.1" ] || [ ."$database_host" = ."::1" ] ; then
+-	systemctl daemon-reload
+-	systemctl restart postgresql
++	pg_ctlcluster 11 main restart
+ fi
+ 
+ #init.d
+diff --git a/debian/resources/postgresql/create.sh b/debian/resources/postgresql/create.sh
+index 0da9048..39b4f22 100755
+--- a/debian/resources/postgresql/create.sh
++++ b/debian/resources/postgresql/create.sh
+@@ -25,4 +25,4 @@ sudo -u postgres psql -p $database_port -c "GRANT ALL PRIVILEGES ON DATABASE fre
+ sudo -u postgres psql -p $database_port -c "GRANT ALL PRIVILEGES ON DATABASE freeswitch to freeswitch;"
+ 
+ #restart postgres
+-service postgresql restart
++supervisorctl postgresql restart
+diff --git a/debian/resources/postgresql/node.sh b/debian/resources/postgresql/node.sh
+index fadee72..107126e 100755
+--- a/debian/resources/postgresql/node.sh
++++ b/debian/resources/postgresql/node.sh
+@@ -117,11 +117,9 @@ for node in $nodes; do
+         echo "hostssl replication     postgres       ${node}/32              trust" >> /etc/postgresql/$database_version/main/pg_hba.conf
+ done
+ 
+-#reload configuration
+-systemctl daemon-reload
+ 
+ #restart postgres
+-service postgresql restart
++supervisorctl postgresql restart
+ 
+ #set the working directory
+ cwd=$(pwd)
+diff --git a/debian/resources/postgresql/pg_hba.sh b/debian/resources/postgresql/pg_hba.sh
+index 4609a91..dca8ba7 100755
+--- a/debian/resources/postgresql/pg_hba.sh
++++ b/debian/resources/postgresql/pg_hba.sh
+@@ -48,11 +48,8 @@ for node in $nodes; do
+         echo "hostssl replication     postgres       ${node}/32              trust" >> /etc/postgresql/$database_version/main/pg_hba.conf
+ done
+ 
+-#reload configuration
+-systemctl daemon-reload
+-
+ #restart postgres
+-service postgresql restart
++supervisorctl postgresql restart
+ 
+ #set the working directory
+ cwd=$(pwd)
+diff --git a/debian/resources/switch.sh b/debian/resources/switch.sh
+index d74dfe9..8be96e9 100755
+--- a/debian/resources/switch.sh
++++ b/debian/resources/switch.sh
+@@ -5,6 +5,7 @@ cd "$(dirname "$0")"
+ 
+ #includes
+ . ./config.sh
++. ./colors.sh
+ . ./environment.sh
+ 
+ if [ .$switch_source = .true ]; then
+diff --git a/debian/resources/switch/dsn.sh b/debian/resources/switch/dsn.sh
+index b96c5b7..9d30626 100755
+--- a/debian/resources/switch/dsn.sh
++++ b/debian/resources/switch/dsn.sh
+@@ -54,4 +54,4 @@ done
+ /usr/bin/fs_cli -x 'memcache flush'
+ 
+ #restart freeswitch
+-service freeswitch restart
++supervisorctl freeswitch restart
+diff --git a/debian/resources/switch/package-systemd.sh b/debian/resources/switch/package-systemd.sh
+index 9bc629c..546916b 100755
+--- a/debian/resources/switch/package-systemd.sh
++++ b/debian/resources/switch/package-systemd.sh
+@@ -7,7 +7,4 @@ then
+     #Disable CPU Scheduler for OpenVZ, not supported on OpenVZ."
+     sed -i -e "s/CPUSchedulingPolicy=rr/;CPUSchedulingPolicy=rr/g" /lib/systemd/system/freeswitch.service
+ fi
+-systemctl enable freeswitch
+-systemctl unmask freeswitch.service
+-systemctl daemon-reload
+-systemctl start freeswitch
++supervisorctl start freeswitch
+diff --git a/debian/resources/upgrade/php.sh b/debian/resources/upgrade/php.sh
+index f11eaa7..614f8a0 100755
+--- a/debian/resources/upgrade/php.sh
++++ b/debian/resources/upgrade/php.sh
+@@ -40,5 +40,5 @@ sed 's#;max_input_vars = .*#max_input_vars = 8000#g' -i $php_ini_file
+ sed 's#; max_input_vars = .*#max_input_vars = 8000#g' -i $php_ini_file
+ 
+ #restart nginx
+-service nginx restart
++supervisorctl nginx restart
+ 
