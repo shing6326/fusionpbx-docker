@@ -10,9 +10,8 @@ if [ "$n" -eq 10 ]; then
     exit 1
 else
     echo 'PostgreSQL started.'
-    sleep 10
 fi
 
 # Start server.
 echo 'Starting Freeswitch...'
-/usr/bin/freeswitch -u www-data -g www-data  -rp -nonat
+exec /usr/bin/freeswitch -u www-data -g www-data  -rp -nonat
