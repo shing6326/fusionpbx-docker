@@ -151,19 +151,6 @@ index b96c5b7..9d30626 100755
  #restart freeswitch
 -service freeswitch restart
 +supervisorctl freeswitch restart
-diff --git a/debian/resources/switch/package-release.sh b/debian/resources/switch/package-release.sh
-index 11bb512..aa65004 100755
---- a/debian/resources/switch/package-release.sh
-+++ b/debian/resources/switch/package-release.sh
-@@ -37,7 +37,7 @@ apt-get install -y freeswitch-mod-imagick freeswitch-mod-tts-commandline freeswi
- apt-get install -y freeswitch-mod-flite freeswitch-mod-distributor freeswitch-meta-codecs
- apt-get install -y freeswitch-mod-pgsql
- apt-get install -y freeswitch-music-default
--apt-get install -y libyuv-dev
-+apt-get install -y libyuv1-dev
- 
- #make sure that postgresql is started before starting freeswitch
- sed -i /lib/systemd/system/freeswitch.service -e s:'local-fs.target:local-fs.target postgresql.service:'
 diff --git a/debian/resources/switch/package-systemd.sh b/debian/resources/switch/package-systemd.sh
 index 9bc629c..546916b 100755
 --- a/debian/resources/switch/package-systemd.sh
