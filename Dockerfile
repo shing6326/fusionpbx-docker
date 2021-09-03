@@ -13,7 +13,7 @@ RUN apt-get update && \
     apt-get upgrade -y && \
     apt-get install -y tini wget sudo supervisor postgresql memcached && \
     chmod 755 /usr/bin/start-freeswitch.sh && \
-    supervisord && \
+    supervisord -c /etc/supervisor/supervisord.conf && \
     wget -O - https://raw.githubusercontent.com/fusionpbx/fusionpbx-install.sh/master/debian/pre-install.sh | sh && \
     cd /usr/src/fusionpbx-install.sh/debian && \
     patch -p2 < /tmp/fusionpbx-install.sh.patch && \
@@ -25,5 +25,5 @@ RUN apt-get update && \
 
 USER root
 VOLUME ["/etc/freeswitch","/etc/fusionpbx","/usr/share/freeswitch/scripts","/usr/share/freeswitch/sounds/music","/var/lib/freeswitch/recordings","/var/lib/freeswitch/storage","/var/lib/postgresql","/var/log/freeswitch"]
-CMD ["/usr/bin/supervisord","-n"]
+CMD ["/usr/bin/supervisord","-n", "-c", "/etc/supervisor/supervisord.conf"]
 ENTRYPOINT ["/usr/bin/tini", "--"]
