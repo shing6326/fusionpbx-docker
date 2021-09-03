@@ -12,6 +12,7 @@ COPY start-freeswitch.sh /usr/bin/start-freeswitch.sh
 RUN apt-get update && \
     apt-get upgrade -y && \
     apt-get install -y tini wget sudo supervisor postgresql memcached && \
+    chmod 755 /usr/bin/start-freeswitch.sh && \
     supervisord && \
     wget -O - https://raw.githubusercontent.com/fusionpbx/fusionpbx-install.sh/master/debian/pre-install.sh | sh && \
     cd /usr/src/fusionpbx-install.sh/debian && \
