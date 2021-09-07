@@ -1,3 +1,18 @@
+diff --git a/debian/resources/config.sh b/debian/resources/config.sh
+index 4ea85ff..bc3796c 100755
+--- a/debian/resources/config.sh
++++ b/debian/resources/config.sh
+@@ -7,8 +7,8 @@ system_branch=master            # master, stable
+ 
+ # FreeSWITCH Settings
+ switch_branch=stable            # master, stable
+-switch_source=false             # true or false
+-switch_package=true             # true or false
++switch_source=true              # true or false
++switch_package=false            # true or false
+ switch_version=1.10.3           # only for source
+ switch_tls=true                 # true or false
+ 
 diff --git a/debian/resources/finish.sh b/debian/resources/finish.sh
 index 34139dc..bfe9024 100755
 --- a/debian/resources/finish.sh

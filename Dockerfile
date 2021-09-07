@@ -11,7 +11,7 @@ COPY start-freeswitch.sh /usr/bin/start-freeswitch.sh
 # Install Required Dependencies
 RUN apt-get update && \
     apt-get upgrade -y && \
-    apt-get install -y tini wget sudo rsync libcurl4-openssl-dev supervisor postgresql memcached && \
+    apt-get install -y tini wget sudo rsync supervisor postgresql memcached && \
     chmod 755 /usr/bin/start-freeswitch.sh && \
     supervisord -c /etc/supervisor/supervisord.conf && \
     wget -O - https://raw.githubusercontent.com/fusionpbx/fusionpbx-install.sh/master/debian/pre-install.sh | sh && \
