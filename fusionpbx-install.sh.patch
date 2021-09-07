@@ -1,10 +1,13 @@
 diff --git a/debian/resources/finish.sh b/debian/resources/finish.sh
-index 34139dc..803442a 100755
+index 34139dc..bfe9024 100755
 --- a/debian/resources/finish.sh
 +++ b/debian/resources/finish.sh
-@@ -25,9 +25,7 @@ sudo -u postgres psql -c "ALTER USER freeswitch WITH PASSWORD '$database_passwor
+@@ -23,11 +23,9 @@ sudo -u postgres psql -c "ALTER USER fusionpbx WITH PASSWORD '$database_password
+ sudo -u postgres psql -c "ALTER USER freeswitch WITH PASSWORD '$database_password';"
+ 
  #install the database backup
- cp backup/fusionpbx-backup /etc/cron.daily
+-cp backup/fusionpbx-backup /etc/cron.daily
++#cp backup/fusionpbx-backup /etc/cron.daily
  cp backup/fusionpbx-maintenance /etc/cron.daily
 -chmod 755 /etc/cron.daily/fusionpbx-backup
  chmod 755 /etc/cron.daily/fusionpbx-maintenance
